@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FocusME! - Pomodoro Timer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Silkscreen:wght@400;700&family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="src/tailwind.css">
+  <style>
+    .font-pixel {
+      font-family: 'Silkscreen', 'Press Start 2P', monospace;
+    }
+    .font-body {
+      font-family: 'Fredoka', sans-serif;
+    }
+  </style>
+</head>
+<body class="bg-[#FAF0CC] text-[#2C2C2C] select-none h-screen w-screen overflow-y-auto flex flex-col font-body border-2 border-[#E7D6A7]/80 rounded-2xl shadow-xl">
+
+  <!-- Desktop Drag & Mini Window Controls Bar -->
+  <div class="app-drag-region h-7 w-full flex items-center justify-between px-3 pt-1 text-xs opacity-75 hover:opacity-100 transition-opacity">
+    <div class="flex items-center gap-1.5 no-drag text-[11px] font-semibold text-[#8B7355]">
+      <span class="w-2 h-2 rounded-full bg-[#fca0b5] inline-block animate-pulse"></span>
+      <span class="text-[10px] tracking-wider uppercase font-pixel">FocusME!</span>
+    </div>
+    
+    <div class="flex items-center gap-2 no-drag">
+      <!-- Pin (Always on top) button -->
+      <button id="win-pin" title="Pin / Always on Top" class="hover:text-[#468cc8] transition-colors p-0.5 text-xs opacity-50 cursor-pointer">
+        📌
+      </button>
+      <!-- Minimize button -->
+      <button id="win-min" title="Minimize" class="hover:text-[#468cc8] transition-colors p-0.5 text-sm font-bold cursor-pointer leading-none">
+        –
+      </button>
+      <!-- Close button -->
+      <button id="win-close" title="Close" class="hover:text-[#e04f6e] transition-colors p-0.5 text-sm font-bold cursor-pointer leading-none">
+        ✕
+      </button>
+    </div>
+  </div>
+
+  <!-- Main Pomodoro Container (faithfully matching screenshot) -->
+  <main class="flex-1 flex flex-col justify-between items-center px-6 pb-6 pt-1 max-w-[380px] mx-auto w-full">
+    
+    <!-- Header with Flame button, Title, Info button -->
+    <header class="w-full flex items-center justify-between">
+      <!-- Flame button (Streak & Stats) -->
+      <button id="btn-flame" title="Focus Streak" class="w-10 h-10 rounded-full border-2 border-[#A6D0F2] bg-[#FAF3DC] flex items-center justify-center shadow-xs hover:scale-105 active:scale-95 transition-transform cursor-pointer">
+        <!-- Cute hand-drawn style flame icon -->
+        <svg class="w-5 h-5 text-[#E6934A]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 3z" fill="#F8BC5B" stroke="#B36B28" stroke-width="1.8"/>
+        </svg>
+      </button>
+
+      <!-- Title: FocusME! in pixel style font -->
+      <h1 class="font-pixel text-[17px] tracking-wider text-[#2A2A2A] font-bold">
+        FocusME!
+      </h1>
+
+      <!-- Info button (About & Settings) -->
+      <button id="btn-info" title="Settings & About" class="w-10 h-10 rounded-full border-2 border-[#A6D0F2] bg-[#FAF3DC] flex items-center justify-center shadow-xs hover:scale-105 active:scale-95 transition-transform cursor-pointer">
+        <!-- Cute circle "i" icon in sky blue -->
+        <span class="text-[#558FB8] font-bold text-lg font-serif">i</span>
+      </button>
+    </header>
+
+    <!-- Center Clock Section with Cute Hand-drawn Illustration -->
+    <div class="relative flex flex-col items-center justify-center my-auto group cursor-pointer" title="Klik jam untuk Mulai / Jeda (Spasi)">
+      
+      <!-- Clock SVG (recreated identically from design) -->
+      <svg id="clock-illustration" class="w-56 h-56 transition-transform select-none filter drop-shadow-xs" viewBox="0 0 260 260" fill="none" xmlns="http://www.w3.org/2000/svg">
+        
+        <!-- Vibration / Action Marks (Top-left pink lines) -->
+        <g class="anim-marks">
+          <path d="M84 66 L92 75" stroke="#F18FA5" stroke-width="4.5" stroke-linecap="round"/>
+          <path d="M76 77 L85 86" stroke="#F18FA5" stroke-width="4.5" stroke-linecap="round"/>
+          <!-- Top-right pink lines -->
+          <path d="M176 75 L168 66" stroke="#F18FA5" stroke-width="4.5" stroke-linecap="round"/>
+          <path d="M184 86 L175 77" stroke="#F18FA5" stroke-width="4.5" stroke-linecap="round"/>
+        </g>
+
+        <!-- Side Vibration Marks (cute black doodle dashes) -->
+        <g class="anim-marks">
+          <path d="M68 126 L64 127" stroke="#232323" stroke-width="3" stroke-linecap="round"/>
+          <path d="M67 145 L61 147" stroke="#232323" stroke-width="3.5" stroke-linecap="round"/>
+          <path d="M72 165 L68 167" stroke="#232323" stroke-width="3" stroke-linecap="round"/>
+          
+          <path d="M192 126 L196 127" stroke="#232323" stroke-width="3" stroke-linecap="round"/>
+          <path d="M193 143 L199 144" stroke="#232323" stroke-width="3.5" stroke-linecap="round"/>
+          <path d="M188 163 L193 166" stroke="#232323" stroke-width="3" stroke-linecap="round"/>
+        </g>
+
+        <!-- Clock Bottom Feet (black rounded angled pegs) -->
+        <path d="M96 205 L87 220 A 6 6 0 0 0 98 226 L107 212 Z" fill="#252525" stroke="#252525" stroke-width="2" stroke-linejoin="round"/>
+        <path d="M164 205 L173 220 A 6 6 0 0 1 162 226 L153 212 Z" fill="#252525" stroke="#252525" stroke-width="2" stroke-linejoin="round"/>
+
+        <!-- Top Ear Bells (Yellow rounded ovals) -->
+        <!-- Left Bell -->
+        <ellipse cx="91" cy="94" rx="14" ry="10" transform="rotate(-38 91 94)" fill="#FFE584" stroke="#232323" stroke-width="4.5"/>
+        <!-- Right Bell -->
+        <ellipse cx="169" cy="94" rx="14" ry="10" transform="rotate(38 169 94)" fill="#FFE584" stroke="#232323" stroke-width="4.5"/>
+
+        <!-- Main Pastel Blue Clock Body -->
+        <circle cx="130" cy="144" r="62" fill="#B4E1FD" stroke="#232323" stroke-width="5.5"/>
+
+        <!-- Top Pink Ribbon Bow -->
+        <!-- Left wing -->
+        <path d="M130 84 C116 67 98 77 108 90 C115 97 127 88 130 85" fill="#FFAEC3" stroke="#232323" stroke-width="4.5" stroke-linejoin="round"/>
+        <!-- Right wing -->
+        <path d="M130 84 C144 67 162 77 152 90 C145 97 133 88 130 85" fill="#FFAEC3" stroke="#232323" stroke-width="4.5" stroke-linejoin="round"/>
+        <!-- Bow Center Knot -->
+        <ellipse cx="130" cy="85" rx="6.5" ry="6" fill="#FFAEC3" stroke="#232323" stroke-width="3.8"/>
+
+        <!-- Inner Clock Cream Face -->
+        <circle cx="130" cy="144" r="47" fill="#FAF2D4" stroke="#232323" stroke-width="5"/>
+
+        <!-- Center Mascot: Cute Cat/Animal Face -->
+        <!-- Mascot Head with Ears -->
+        <path d="M117 145 C115 141 114 137 118 135 C122 133 123 138 125 139 C127 138 133 138 135 139 C137 138 138 133 142 135 C146 137 145 141 143 145 C147 148 146 154 142 157 C138 160 122 160 118 157 C114 154 113 148 117 145 Z" fill="#FFEFE7" stroke="#232323" stroke-width="3" stroke-linejoin="round"/>
+        <!-- Mascot Pink Blushing Cheeks -->
+        <circle cx="121" cy="148" r="2.2" fill="#FFA0B8"/>
+        <circle cx="139" cy="148" r="2.2" fill="#FFA0B8"/>
+        <!-- Mascot Eyes -->
+        <circle cx="125" cy="145" r="1.4" fill="#232323"/>
+        <circle cx="135" cy="145" r="1.4" fill="#232323"/>
+        <!-- Mascot Nose/Mouth -->
+        <ellipse cx="130" cy="147" rx="1.2" ry="0.9" fill="#232323"/>
+
+        <!-- Rotating Clock Hands -->
+        <!-- Hour Hand (pointing up at 12 o'clock) -->
+        <g id="hour-hand-group" class="transition-transform duration-300" style="transform-origin: 130px 144px;">
+          <line x1="130" y1="136" x2="130" y2="114" stroke="#232323" stroke-width="4.2" stroke-linecap="round"/>
+          <polygon points="126,117 130,109 134,117" fill="#232323"/>
+        </g>
+
+        <!-- Minute Hand (pointing at 4:20 ~ 125deg) -->
+        <g id="minute-hand-group" class="transition-transform duration-300" style="transform-origin: 130px 144px;">
+          <line x1="130" y1="144" x2="151" y2="162" stroke="#232323" stroke-width="4.2" stroke-linecap="round"/>
+          <polygon points="145,164 155,166 153,156" fill="#232323"/>
+        </g>
+      </svg>
+
+      <!-- Digital Countdown & Quick Control Badge below clock -->
+      <div class="flex items-center gap-2 mt-1 bg-[#FAF3DC]/90 px-3 py-1 rounded-full border border-[#DBCFA6] shadow-xs hover:border-[#fca0b5] transition-colors">
+        <span id="time-display" class="font-pixel text-[13px] tracking-wider text-[#262626] font-bold">
+          05:00
+        </span>
+        <span id="status-badge" class="text-[9px] font-bold px-2 py-0.5 rounded-full bg-[#a3cff0] text-[#1e4e79] shadow-2xs uppercase">
+          START
+        </span>
+      </div>
+    </div>
+
+    <!-- Mode Selector: Coffee (Break), Book (Study), Briefcase (Work) -->
+    <div class="w-full flex items-center justify-center gap-9 my-1">
+      
+      <!-- Mode 1: Coffee Cup (Short Break - 5 min default) -->
+      <button id="mode-break" title="Short Break (5 min)" class="w-11 h-11 rounded-full bg-[#E58596] flex items-center justify-center text-white cursor-pointer transition-all duration-200 hover:scale-115">
+        <svg class="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M2 19h18v2H2v-2zm16-8V7H4v8c0 2.21 1.79 4 4 4h6c2.21 0 4-1.79 4-4v-1h2c1.1 0 2-.9 2-2v-1c0-1.1-.9-2-2-2h-2zm0 2h2v1h-2v-1zM6 3c.34.8 1.12 1.4 2 1.4s1.66-.6 2-1.4h2c-.34.8-1.12 1.4-2 1.4s-1.66-.6-2-1.4H6z"/>
+        </svg>
+      </button>
+
+      <!-- Mode 2: Book (Study / Focus - 25 min default) -->
+      <button id="mode-study" title="Study Mode (25 min)" class="w-11 h-11 rounded-full bg-[#9DC6E5] flex items-center justify-center text-white cursor-pointer transition-all duration-200 hover:scale-115">
+        <svg class="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"/>
+        </svg>
+      </button>
+
+      <!-- Mode 3: Briefcase (Deep Work - 50 min default) -->
+      <button id="mode-work" title="Deep Work (50 min)" class="w-11 h-11 rounded-full bg-[#687C8E] flex items-center justify-center text-white cursor-pointer transition-all duration-200 hover:scale-115">
+        <svg class="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M20 6h-4V4c0-1.11-.89-2-2-2h-4c-1.11 0-2 .89-2 2v2H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-6 0h-4V4h4v2z"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Duration Slider Bar & Label matching screenshot -->
+    <div class="w-full flex items-center justify-between gap-3 px-2 pt-2 mb-4">
+      <div class="flex-1 flex items-center">
+        <input id="duration-slider" type="range" min="1" max="90" value="5" class="w-full cursor-pointer">
+      </div>
+      <!-- Time indicator text (e.g. "5 min" in pixel retro font) -->
+      <span id="slider-label" class="font-pixel text-[12px] text-[#333333] whitespace-nowrap min-w-[54px] text-right">
+        5 min
+      </span>
+    </div>
+
+    <!-- My Streak Section directly in Main view matching screenshot -->
+    <section class="w-full flex flex-col items-center mt-2 mb-3">
+      <h2 class="font-pixel text-[13px] text-[#222222] tracking-wider mb-2">My Streak</h2>
+
+      <div class="w-full max-w-[340px] border border-[#222222] rounded-none overflow-hidden shadow-xs">
+        <!-- Calendar Header -->
+        <div class="bg-[#DCE9FC] border-b border-[#222222] flex items-center justify-between px-3 py-1 font-pixel text-xs text-[#222222]">
+          <span>2026</span>
+          <span id="cal-month-label">October</span>
+          <div class="flex items-center gap-2">
+            <button id="cal-prev" title="Bulan Sebelumnya" class="hover:opacity-75 font-bold cursor-pointer px-1">^</button>
+            <button id="cal-next" title="Bulan Berikutnya" class="hover:opacity-75 font-bold cursor-pointer px-1">v</button>
+          </div>
+        </div>
+        <!-- Days of Week Header -->
+        <div class="grid grid-cols-7 bg-[#DCE9FC] border-b border-[#222222] text-center font-pixel text-[8px] text-[#222222] py-1">
+          <span>Mon</span><span>Tue</span><span>Wed</span><span>Thur</span><span>Fri</span><span>Sat</span><span>Sun</span>
+        </div>
+        <!-- Calendar Grid -->
+        <div id="cal-grid" class="grid grid-cols-7 bg-[#F29B9F] text-center font-pixel text-[10px]">
+          <!-- Populated by renderCalendar() -->
+        </div>
+      </div>
+
+      <!-- Total Time Summary -->
+      <div class="font-pixel text-xs text-[#222222] mt-3">
+        Σ <span id="total-time">120 min</span>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Modal 1: Focus Streak & Stats (Opened by Flame button) -->
+  <div id="stats-modal" class="hidden absolute inset-0 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4 z-50">
+    <div class="bg-[#FAF3DC] border-2 border-[#8B7355] rounded-2xl p-5 w-full max-w-[320px] shadow-2xl flex flex-col gap-3">
+      <div class="flex items-center justify-between border-b border-[#E0D0A5] pb-2">
+        <h2 class="font-pixel text-sm text-[#2C2C2C] flex items-center gap-2">
+          <span>🔥</span> Focus Streak
+        </h2>
+        <button id="close-stats" class="text-sm font-bold text-[#8B7355] hover:text-[#e04f6e] cursor-pointer">✕</button>
+      </div>
+
+      <div class="grid grid-cols-3 gap-2 text-center py-2">
+        <div class="bg-[#FFF8E7] p-2 rounded-xl border border-[#E7D6A7]">
+          <div id="streak-count" class="font-pixel text-lg text-[#E6934A]">0</div>
+          <div class="text-[10px] text-[#7A6B5D] font-medium">Streak Hari</div>
+        </div>
+        <div class="bg-[#FFF8E7] p-2 rounded-xl border border-[#E7D6A7]">
+          <div id="completed-count" class="font-pixel text-lg text-[#E58596]">0</div>
+          <div class="text-[10px] text-[#7A6B5D] font-medium">Sesi Selesai</div>
+        </div>
+      </div>
+
+      <p class="text-xs text-[#6B5A49] text-center italic">
+        "Konsistensi kecil setiap hari membawa hasil luar biasa!"
+      </p>
+
+      <button id="reset-streak-btn" class="mt-1 text-[11px] text-[#a04e5d] hover:underline text-center cursor-pointer">
+        Reset Statistik
+      </button>
+    </div>
+  </div>
+
+  <!-- Modal 2: About & Settings (Opened by Info button) -->
+  <div id="info-modal" class="hidden absolute inset-0 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4 z-50">
+    <div class="bg-[#FAF3DC] border-2 border-[#8B7355] rounded-2xl p-5 w-full max-w-[330px] shadow-2xl flex flex-col gap-3 max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between border-b border-[#E0D0A5] pb-2">
+        <h2 class="font-pixel text-sm text-[#2C2C2C] flex items-center gap-2">
+          <span>ℹ️</span> Pengaturan & Info
+        </h2>
+        <button id="close-info" class="text-sm font-bold text-[#8B7355] hover:text-[#e04f6e] cursor-pointer">✕</button>
+      </div>
+
+      <!-- Presets customization -->
+      <div class="flex flex-col gap-2 text-xs">
+        <span class="font-bold text-[#4A3E31]">Durasi Bawaan (Menit):</span>
+        <div class="grid grid-cols-3 gap-2">
+          <div>
+            <label class="text-[10px] text-[#6B5A49] block">☕ Break</label>
+            <input id="input-break-duration" type="number" min="1" max="60" value="5" class="w-full bg-[#FFF8E7] border border-[#D5C296] rounded-lg px-2 py-1 text-center font-bold">
+          </div>
+          <div>
+            <label class="text-[10px] text-[#6B5A49] block">📖 Study</label>
+            <input id="input-study-duration" type="number" min="1" max="90" value="25" class="w-full bg-[#FFF8E7] border border-[#D5C296] rounded-lg px-2 py-1 text-center font-bold">
+          </div>
+          <div>
+            <label class="text-[10px] text-[#6B5A49] block">💼 Work</label>
+            <input id="input-work-duration" type="number" min="1" max="120" value="50" class="w-full bg-[#FFF8E7] border border-[#D5C296] rounded-lg px-2 py-1 text-center font-bold">
+          </div>
+        </div>
+      </div>
+
+      <!-- Toggles -->
+      <div class="flex flex-col gap-2 pt-2 border-t border-[#E0D0A5] text-xs">
+        <label class="flex items-center justify-between cursor-pointer">
+          <span class="text-[#4A3E31]">Suara Chime & Klik</span>
+          <input id="sound-toggle" type="checkbox" checked class="accent-[#fca0b5] cursor-pointer">
+        </label>
+        <label class="flex items-center justify-between cursor-pointer">
+          <span class="text-[#4A3E31]">Selalu di Atas (Always on Top)</span>
+          <input id="pin-toggle" type="checkbox" class="accent-[#fca0b5] cursor-pointer">
+        </label>
+      </div>
+
+      <!-- Shortcuts Guide -->
+      <div class="bg-[#FFF8E7] p-2.5 rounded-xl border border-[#E7D6A7] text-[11px] text-[#6B5A49] space-y-1">
+        <div class="font-bold text-[#4A3E31]">Tombol Pintas:</div>
+        <div>• <kbd class="bg-[#ECE0BD] px-1 py-0.5 rounded font-mono text-[10px]">Spasi</kbd> : Mulai / Jeda Timer</div>
+        <div>• <kbd class="bg-[#ECE0BD] px-1 py-0.5 rounded font-mono text-[10px]">R</kbd> : Reset Waktu ke Awal</div>
+        <div>• Klik pada jam untuk mulai/jeda</div>
+      </div>
+
+      <div class="text-[10px] text-center text-[#8C7A67] pt-1">
+        FocusME! Desktop Pomodoro • Dibuat dengan Bun & Tailwind CSS
+      </div>
+    </div>
+  </div>
+
+  <script src="src/app.js"></script>
+</body>
+</html>

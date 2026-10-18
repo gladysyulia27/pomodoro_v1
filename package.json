@@ -1,0 +1,24 @@
+{
+  "name": "focusme-pomodoro",
+  "version": "1.0.0",
+  "description": "Cute aesthetic Pomodoro timer desktop app",
+  "main": "main.js",
+  "scripts": {
+    "build:css": "bunx @tailwindcss/cli -i ./src/style.css -o ./src/tailwind.css --minify",
+    "watch:css": "bunx @tailwindcss/cli -i ./src/style.css -o ./src/tailwind.css --watch",
+    "start": "bun run build:css && electron .",
+    "dev": "bun run build:css && electron .",
+    "app": "electron .",
+    "test": "bun test --coverage",
+    "lint": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.3.3",
+    "@types/bun": "latest",
+    "autoprefixer": "^10.6.1",
+    "electron": "^44.9.0",
+    "happy-dom": "^21.0.3",
+    "postcss": "^8.5.30",
+    "tailwindcss": "^4.3.3"
+  }
+}
