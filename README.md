@@ -107,7 +107,7 @@ Anda dapat menjalankan aplikasi menggunakan salah satu perintah di bawah ini:
 bun start
 ```
 
-Perintah ini akan mengompilasi CSS terbaru dan langsung membuka jendela desktop **FocusME!**.
+Perintah ini akan mengompilasi CSS terbaru (`bun run build:css`) dan langsung membuka jendela desktop **FocusME!** via Electron.
 
 ### 2. Mode Pengembangan (Development)
 
@@ -115,7 +115,17 @@ Perintah ini akan mengompilasi CSS terbaru dan langsung membuka jendela desktop 
 bun run dev
 ```
 
-### 3. Mode Pantau CSS (Watch Mode)
+Sama seperti `bun start`, mengeksekusi build CSS dan meluncurkan Electron.
+
+### 3. Mode Peluncur Cepat (Tanpa Rebuild CSS)
+
+```bash
+bun run app
+```
+
+Menjalankan binary Electron secara langsung (`electron .`) tanpa memproses ulang berkas CSS.
+
+### 4. Mode Pantau CSS (Watch Mode)
 
 Jika Anda sedang mengubah kelas Tailwind atau style CSS dan ingin otomatis terkompilasi setiap kali file disimpan:
 
@@ -123,20 +133,36 @@ Jika Anda sedang mengubah kelas Tailwind atau style CSS dan ingin otomatis terko
 bun run watch:css
 ```
 
-### 4. Menjalankan Langsung via Entrypoint Bun
+### 5. Kompilasi Manual Tailwind CSS
+
+```bash
+bun run build:css
+```
+
+### 6. Menjalankan Langsung via Entrypoint Bun Launcher
 
 ```bash
 bun run index.ts
 ```
 
-### 5. Menjalankan Pengujian (Automated Tests & 100% Coverage)
+### 7. Menjalankan Pengujian (Automated Tests & 100% Coverage)
 
-Untuk menjalankan seluruh unit test lengkap dengan laporan coverage:
+Untuk menjalankan seluruh 90 unit test lengkap dengan verifikasi laporan cakupan kode 100%:
 
 ```bash
 bun run test
 # atau langsung:
 bun test --coverage
+```
+
+### 8. Pengecekan Sintaksis & Tipe (Linting)
+
+Untuk memvalidasi integritas tipe TypeScript tanpa menghasilkan berkas output:
+
+```bash
+bun run lint
+# atau langsung:
+tsc --noEmit
 ```
 
 ---
@@ -179,14 +205,14 @@ Pengaturan jendela desktop dapat disesuaikan pada berkas [`main.js`](main.js):
 ```javascript
 mainWindow = new BrowserWindow({
   width: 410, // Lebar awal jendela (px)
-  height: 480, // Tinggi awal jendela (px)
+  height: 760, // Tinggi awal jendela (px) - mengakomodasi tampilan jam & widget My Streak
   resizable: true, // Apakah ukuran jendela dapat diubah
   minWidth: 380, // Lebar minimum
   minHeight: 460, // Tinggi minimum
   maxWidth: 520, // Lebar maksimum
-  maxHeight: 600, // Tinggi maksimum
+  maxHeight: 900, // Tinggi maksimum
   frame: false, // false = frameless modern (tanpa border default OS)
-  backgroundColor: "#FAF0CC", // Warna latar saat memuat
+  backgroundColor: '#FAF0CC', // Warna latar saat memuat
   alwaysOnTop: false, // Atur true jika ingin selalu di atas sejak dibuka
   // ...
 });

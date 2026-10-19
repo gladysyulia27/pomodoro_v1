@@ -1,9 +1,21 @@
-import { describe, it, expect, mock } from "bun:test";
+import { describe, it, expect, mock, beforeEach, afterEach, spyOn } from "bun:test";
 import { launchApp, defaultExit, autoRun } from "../index.ts";
 import EventEmitter from "events";
 import path from "path";
 
 describe("index.ts (Electron launcher)", () => {
+  let logSpy: any;
+  let errSpy: any;
+
+  beforeEach(() => {
+    logSpy = spyOn(console, "log").mockImplementation(() => {});
+    errSpy = spyOn(console, "error").mockImplementation(() => {});
+  });
+
+  afterEach(() => {
+    logSpy.mockRestore();
+    errSpy.mockRestore();
+  });
   it("defaultExit calls process.exit", () => {
     const origExit = process.exit;
     let codeCalled: number | null = null;
